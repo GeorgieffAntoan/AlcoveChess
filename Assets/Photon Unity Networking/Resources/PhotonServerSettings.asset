@@ -40,4 +40,6 @@ MonoBehaviour:
   - SetColor
   - OnPointerClick
   - ColorChange
+  - Action
+  - MovePiece
   DisableAutoOpenWizard: 1

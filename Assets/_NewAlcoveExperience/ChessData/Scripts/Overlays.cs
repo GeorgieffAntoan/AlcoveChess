@@ -12,13 +12,13 @@ public class Overlays : MonoBehaviour
 
     void Update()
     {
-        if (objectPointer.go.name.Equals(this.name))
-        {
-            Action();
-        }
+      //  if (objectPointer.go.name.Equals(this.name))
+      //  {
+       //     Action();
+      //  }
     }
 
-    void Action()
+    public void Action()
     {
         if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
@@ -27,6 +27,6 @@ public class Overlays : MonoBehaviour
             {
                 Destroy(o);
             }
-        }
+        } 
     }
 }

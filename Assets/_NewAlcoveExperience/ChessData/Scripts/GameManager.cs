@@ -15,14 +15,16 @@ public class GameManager : MonoBehaviour
     public GameObject me;
     public AudioSource playMe;
     public GameObject startPanel;
-    GameObject laser;
+  //  GameObject laser;
     public bool sngP = true;
+
 	void Start ()
     {
+        OVRManager.display.displayFrequency = 72.0f;
         _board = Board.Instance;
         _board.SetupBoard();
         playMe.Play();
-        laser = GameObject.Find("Laser");
+      //  laser = GameObject.Find("Laser");
         //set my team
         if (PhotonNetwork.isMasterClient)
             myTeam = "WHITE"; //host is always white

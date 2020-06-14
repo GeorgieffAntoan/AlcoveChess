@@ -196,13 +196,13 @@ public class MoveFactory
     {
         if (_player != tile.CurrentPiece.Player)
         {
-            Debug.Log("its me");
+        //    Debug.Log("its me");
 
             return true;
         }
         else
         {
-            Debug.Log("its you");
+       //     Debug.Log("its you");
             return false;
         }
     }

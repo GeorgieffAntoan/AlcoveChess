@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ObjectPointer : MonoBehaviour
 {
-    public GameObject pointer;
+  /*  public GameObject pointer;
 
     public GameObject go;
 
@@ -26,6 +26,7 @@ public class ObjectPointer : MonoBehaviour
                 go = hit.transform.gameObject;
                 //    go.tag = "tagged
                 //  if (go.name=="MoveCube(Clone)" || go.name=="CurrentPiece(Clone)")go.tag = "Highlight";
+                Debug.Log(go);
                 if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger) && go.name == "MoveCube(Clone)")
                 {
                     go.tag = "tagged";
@@ -58,5 +59,5 @@ public class ObjectPointer : MonoBehaviour
     public GameObject GetPointedGo()
     {
         return go;
-    }
+    }  */
 }

@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+
 
 public class Piece : MonoBehaviour
 {
@@ -11,7 +13,8 @@ public class Piece : MonoBehaviour
     private ObjectPointer objectPointer;
 
     [SerializeField] private pieceType _type = pieceType.UNKNOWN;
-    [SerializeField] private playerColor _player = playerColor.UNKNOWN;
+    [SerializeField] private playerColor _player = playerColor.WHITE;
+
     public pieceType Type
     {
         get { return _type; }
@@ -20,7 +23,7 @@ public class Piece : MonoBehaviour
     {
         get { return _player; }
     }
-
+   
     public Sprite pieceImage = null;
     public int2 position;
     private Vector3 moveTo;
@@ -36,10 +39,11 @@ public class Piece : MonoBehaviour
         set { _hasMoved = value; }
     }
 
+    [PunRPC]
     public void Action()
     {
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger) && _player == playerColor.WHITE && manager.playerTurn)
-        {
+       // if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
+       // {
             moves.Clear();
             GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
             foreach (GameObject o in objects)
@@ -57,6 +61,8 @@ public class Piece : MonoBehaviour
                     instance.transform.localScale = transform.lossyScale;
                     instance.transform.rotation = transform.rotation;
                     instance.GetComponent<Container>().move = move;
+                    manager.EndTurn();
+
                 }
                 else if (move.pieceKilled != null)
                 {
@@ -66,58 +72,60 @@ public class Piece : MonoBehaviour
                     instance.transform.rotation = transform.rotation;
                     instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
                     instance.GetComponent<Container>().move = move;
+                    manager.EndTurn();
+
                 }
             }
             GameObject i = Instantiate(Resources.Load("CurrentPiece")) as GameObject;
             i.transform.position = this.transform.position;
             i.transform.localScale = transform.lossyScale;
             i.transform.rotation = transform.rotation;
-        }
-        if (!manager.sngP)
-        {
-            if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger) && _player == playerColor.BLACK && !manager.playerTurn)
+      //  }
+        /*    if (!manager.sngP)
             {
-                moves.Clear();
-                GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
-                foreach (GameObject o in objects)
+                if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger) && _player2 == playerColor.BLACK)
                 {
-                    Destroy(o);
-                }
-                moves = factory.GetMoves(this, position);
-                foreach (Move move in moves)
-                {
-                    if (move.pieceKilled == null)
+                    moves.Clear();
+                    GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
+                    foreach (GameObject o in objects)
                     {
-                        GameObject instance = Instantiate(Resources.Load("MoveCube")) as GameObject;
-                        int2 offset = position - move.secondPosition.Position;
-                        instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
-                        instance.transform.localScale = transform.lossyScale;
-                        instance.transform.rotation = transform.rotation;
-                        instance.GetComponent<Container>().move = move;
+                        Destroy(o);
                     }
-                    else if (move.pieceKilled != null)
+                    moves = factory.GetMoves(this, position);
+                    foreach (Move move in moves)
                     {
-                        GameObject instance = Instantiate(Resources.Load("KillCube")) as GameObject;
-                        int2 offset = position - move.secondPosition.Position;
-                        instance.transform.localScale = transform.lossyScale;
-                        instance.transform.rotation = transform.rotation;
-                        instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
-                        instance.GetComponent<Container>().move = move;
+                        if (move.pieceKilled == null)
+                        {
+                            GameObject instance = Instantiate(Resources.Load("MoveCube")) as GameObject;
+                            int2 offset = position - move.secondPosition.Position;
+                            instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
+                            instance.transform.localScale = transform.lossyScale;
+                            instance.transform.rotation = transform.rotation;
+                            instance.GetComponent<Container>().move = move;
+                        }
+                        else if (move.pieceKilled != null)
+                        {
+                            GameObject instance = Instantiate(Resources.Load("KillCube")) as GameObject;
+                            int2 offset = position - move.secondPosition.Position;
+                            instance.transform.localScale = transform.lossyScale;
+                            instance.transform.rotation = transform.rotation;
+                            instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
+                            instance.GetComponent<Container>().move = move;
+                        }
                     }
+                    GameObject i = Instantiate(Resources.Load("CurrentPiece")) as GameObject;
+                    i.transform.position = this.transform.position;
+                    i.transform.localScale = transform.lossyScale;
+                    i.transform.rotation = transform.rotation;
                 }
-                GameObject i = Instantiate(Resources.Load("CurrentPiece")) as GameObject;
-                i.transform.position = this.transform.position;
-                i.transform.localScale = transform.lossyScale;
-                i.transform.rotation = transform.rotation;
             }
-        }
+        } */
     }
 
     public void MovePiece(int2 pos)
     {
         int2 offset = position - pos;     
         moveTo = transform.localPosition + new Vector3(-offset.x, 0, offset.y);
-     //   manager.EndTurn();
     }
 
     void Start()
@@ -125,16 +133,18 @@ public class Piece : MonoBehaviour
         transform.localPosition = new Vector3(position.x, 0, -position.y);
         moveTo = this.transform.localPosition;
         manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
-        objectPointer = GameObject.Find("Laser").GetComponent<ObjectPointer>();
+       objectPointer = GameObject.Find("Laser").GetComponent<ObjectPointer>();
  
     }
 
     void Update()
     {
         transform.localPosition = Vector3.Lerp(this.transform.localPosition, moveTo, 3 * Time.deltaTime);
-        if (objectPointer != null && objectPointer.go == gameObject && OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
+        if (/*objectPointer != null && objectPointer.go == gameObject &&*/ OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
         {
-            Action();
+            PhotonView photonView = GetComponent<PhotonView>();
+          //  photonView.RPC("Action", PhotonTargets.AllBuffered);
+         //   Action();
         }
     }
 }
