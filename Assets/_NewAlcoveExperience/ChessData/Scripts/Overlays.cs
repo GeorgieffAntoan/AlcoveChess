@@ -19,7 +19,7 @@ public class Overlays : MonoBehaviour
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
         foreach (GameObject o in objects)
         {
-           Destroy(o);
+           PhotonNetwork.Destroy(o);
         }
     }
 

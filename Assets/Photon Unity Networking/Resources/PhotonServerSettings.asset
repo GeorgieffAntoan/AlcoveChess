@@ -43,4 +43,6 @@ MonoBehaviour:
   - Single
   - SwapPieces
   - Turn
+  - Action
+  - SwapMe
   DisableAutoOpenWizard: 1

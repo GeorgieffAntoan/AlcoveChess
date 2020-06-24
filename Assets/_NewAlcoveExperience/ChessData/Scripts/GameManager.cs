@@ -39,10 +39,10 @@ public class GameManager : Photon.PunBehaviour
         playMe.Play();
         //  laser = GameObject.Find("Laser");
         //set my team
-        if (PhotonNetwork.isMasterClient)
+     /*   if (PhotonNetwork.isMasterClient)
             myTeam = "WHITE"; //host is always white
         else
-            myTeam = "BLACK";
+            myTeam = "BLACK"; */
         startPanel.SetActive(true);
         playerTurn = true;
     }
@@ -149,11 +149,11 @@ public class GameManager : Photon.PunBehaviour
             GC.Collect();
             _timeSinceLastGarbageCollection = 0f;
         }
-      // if (firstTile.CurrentPiece.position.x == secondTile.CurrentPiece.position.x) Destroy(secondTile.CurrentPiece.gameObject);
-        if (PhotonNetwork.isMasterClient)
+     //  if (firstTile.CurrentPiece.position.x == secondTile.CurrentPiece.position.x) Destroy(secondTile.CurrentPiece.gameObject);
+      /*  if (PhotonNetwork.isMasterClient)
             myTeam = "WHITE"; //host is always white
         else
-            myTeam = "BLACK";
+            myTeam = "BLACK"; */
     }
 
     public bool playerTurn = true;

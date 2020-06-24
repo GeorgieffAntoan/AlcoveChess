@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.IO;
+using ExitGames.Client.Photon;
+using BayatGames.Serialization.Formatters.Binary;
+using System;
 
+[System.Serializable]
 public class Move
 {
     public Tile firstPosition = null;

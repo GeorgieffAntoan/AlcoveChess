@@ -5,10 +5,14 @@ using System.Collections;
 
 public class Container : MonoBehaviour
 {
+    [SerializeField]
     public Move move;
     GameManager manager;
+    MoveFactory moveFactory;
     private ObjectPointer objectPointer;
     private ObjectPointer objectPointer1;
+    public Move moveIndex;
+
 
 
     PhotonView photonView;
@@ -26,12 +30,13 @@ public class Container : MonoBehaviour
     }
     public void Action()
     {
-        manager.SwapPieces(move);
+     //  manager.SwapPieces(move);
 
-     // photonView = GetComponent<PhotonView>();
-     // photonView.RPC("SwapPieces", PhotonTargets.AllBuffered, move);
+      photonView = GetComponent<PhotonView>();      photonView.RPC("SwapPieces", PhotonTargets.AllBuffered, move);
     }
+
     
+    [PunRPC]
     public void SwapMe()
     {
         manager.SwapPieces(move);

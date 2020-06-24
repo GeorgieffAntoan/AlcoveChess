@@ -17,7 +17,7 @@ public class KillMeMe : MonoBehaviour
         else gameObject.GetComponent<Rigidbody>().isKinematic = true;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "White") Destroy(gameObject);
 

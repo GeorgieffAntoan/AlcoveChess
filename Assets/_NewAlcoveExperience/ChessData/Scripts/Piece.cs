@@ -33,6 +33,7 @@ public class Piece : MonoBehaviour
     PhotonView photonView;
     private MoveFactory factory = new MoveFactory(Board.Instance);
     private List<Move> moves = new List<Move>();
+    int counter = 100;
 
     private bool _hasMoved = false;
     public bool HasMoved
@@ -42,12 +43,6 @@ public class Piece : MonoBehaviour
     }
     [PunRPC]
     public void Action2()
-    {
-       
-       
-    }
-
-    public void Action()
     {
         if (_player == playerColor.WHITE && PhotonNetwork.isMasterClient)
         {
@@ -67,10 +62,13 @@ public class Piece : MonoBehaviour
                     //GameObject instance = PhotonNetwork.Instantiate("MoveCube", (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z)), transform.rotation, 1);
 
                     instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
-                    instance.transform.localScale = transform.lossyScale/1.01f;
+                    instance.transform.localScale = transform.lossyScale / 1.01f;
                     instance.transform.rotation = transform.rotation;
                     instance.GetComponent<Container>().move = move;
-                    manager.EndTurn();
+                    PhotonView[] nViews = instance.GetComponents<PhotonView>();
+                    nViews[0].viewID = counter;
+                    counter++;
+                    //  manager.EndTurn();
 
                 }
                 else if (move.pieceKilled != null)
@@ -79,11 +77,14 @@ public class Piece : MonoBehaviour
                     int2 offset = position - move.secondPosition.Position;
                     //   GameObject instance = PhotonNetwork.Instantiate("KillCube", (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z)), transform.rotation, 1);
 
-                    instance.transform.localScale = transform.lossyScale/1.01f;
+                    instance.transform.localScale = transform.lossyScale / 1.01f;
                     instance.transform.rotation = transform.rotation;
                     instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
                     instance.GetComponent<Container>().move = move;
-                    manager.EndTurn();
+                    PhotonView[] nViews4 = instance.GetComponents<PhotonView>();
+                    nViews4[0].viewID = counter;
+                    counter++;
+                    //   manager.EndTurn();
 
 
                 }
@@ -92,8 +93,11 @@ public class Piece : MonoBehaviour
             //   GameObject i = PhotonNetwork.Instantiate("CurrentPiece", this.transform.position, transform.rotation, 1);
 
             i.transform.position = this.transform.position;
-            i.transform.localScale = transform.lossyScale/1.01f;
+            i.transform.localScale = transform.lossyScale / 1.01f;
             i.transform.rotation = transform.rotation;
+            PhotonView[] nViews6 = i.GetComponents<PhotonView>();
+            nViews6[0].viewID = counter;
+  
         }
         if (!manager.sngP && !PhotonNetwork.isMasterClient && _player == playerColor.BLACK)
         {
@@ -112,10 +116,13 @@ public class Piece : MonoBehaviour
                     int2 offset = position - move.secondPosition.Position;
                     //GameObject instance = PhotonNetwork.Instantiate("MoveCube", (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z)), transform.rotation, 1);
                     instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
-                    instance.transform.localScale = transform.lossyScale/1.01f;
+                    instance.transform.localScale = transform.lossyScale / 1.01f;
                     instance.transform.rotation = transform.rotation;
                     instance.GetComponent<Container>().move = move;
                     manager.EndTurn();
+                    PhotonView[] nViews2 = instance.GetComponents<PhotonView>();
+                    nViews2[0].viewID = counter;
+                    counter++;
 
                 }
                 else if (move.pieceKilled != null)
@@ -123,20 +130,34 @@ public class Piece : MonoBehaviour
                     GameObject instance = Instantiate(Resources.Load("KillCube")) as GameObject;
                     int2 offset = position - move.secondPosition.Position;
                     //  GameObject instance = PhotonNetwork.Instantiate("KillCube", (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z)), transform.rotation, 1);
-                    instance.transform.localScale = transform.lossyScale/1.01f;
+                    instance.transform.localScale = transform.lossyScale / 1.01f;
                     instance.transform.rotation = transform.rotation;
                     instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
                     instance.GetComponent<Container>().move = move;
                     manager.EndTurn();
+                    PhotonView[] nViews3 = instance.GetComponents<PhotonView>();
+                    nViews3[0].viewID = counter;
+                    counter++;
 
                 }
             }
             GameObject i = Instantiate(Resources.Load("CurrentPiece")) as GameObject;
             //   GameObject i = PhotonNetwork.Instantiate("CurrentPiece", this.transform.position, transform.rotation, 1);
             i.transform.position = this.transform.position;
-            i.transform.localScale = transform.lossyScale/1.01f;
+            i.transform.localScale = transform.lossyScale / 1.01f;
             i.transform.rotation = transform.rotation;
+            PhotonView[] nViews5 = i.GetComponents<PhotonView>();
+            nViews5[0].viewID = counter;
+            counter++;
         }
+    }
+
+    [PunRPC]
+    public void Action()
+    {
+        PhotonView photonView = this.GetComponent<PhotonView>();
+        photonView.RPC("Action2", PhotonTargets.AllBuffered);
+      
     }
 
     [PunRPC]

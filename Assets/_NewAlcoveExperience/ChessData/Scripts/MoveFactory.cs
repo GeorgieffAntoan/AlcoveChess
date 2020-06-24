@@ -13,6 +13,9 @@ public class MoveFactory
     private Piece.pieceType _type;
     private Piece.playerColor _player;
     private int2 _position;
+    GameManager manager;
+
+
 
     public MoveFactory(Board board)
     {
@@ -205,6 +208,14 @@ public class MoveFactory
             //     Debug.Log("its you");
             return false;
         }
+    }
+
+
+    [PunRPC]
+    public void SwapPiecesByIndex(int index)
+    {
+        Move move = moves[index];
+        manager.SwapPieces(move);
     }
 
     bool _ContainsPiece(Tile tile)

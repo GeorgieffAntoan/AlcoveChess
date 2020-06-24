@@ -9,7 +9,7 @@ public class ChangeOwner : Photon.PunBehaviour
  
     public void Click()
     {
-        if (!photonView.isMine)  
+        if (!photonView.isMine && !PhotonNetwork.isMasterClient)  
         base.photonView.RequestOwnership();
     }
 
