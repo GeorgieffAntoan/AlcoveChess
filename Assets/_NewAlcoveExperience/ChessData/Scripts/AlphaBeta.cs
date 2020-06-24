@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 
 public class AlphaBeta
-{   
+{
     int maxDepth = 4;
 
     List<Move> _moves = new List<Move>();
@@ -13,7 +13,7 @@ public class AlphaBeta
     List<Tile> _whitePieces = new List<Tile>();
     Stack<Move> moveStack = new Stack<Move>();
     Weights _weight = new Weights();
-    Tile[,] _localBoard = new Tile[8,8];
+    Tile[,] _localBoard = new Tile[8, 8];
     int _whiteScore = 0;
     int _blackScore = 0;
     Move bestMove;
@@ -27,11 +27,9 @@ public class AlphaBeta
         AB(maxDepth, -100000000, 1000000000, true);
         return bestMove;
     }
-
     int AB(int depth, int alpha, int beta, bool max)
     {
         _GetBoardState();
-
         if (depth == 0)
         {
             return _Evaluate();
@@ -40,11 +38,11 @@ public class AlphaBeta
         {
             int score = -10000000;
             List<Move> allMoves = _GetMoves(Piece.playerColor.BLACK);
-            foreach (Move move in allMoves)
+            for (int i = 0; i < allMoves.Count; i++)
             {
-                moveStack.Push(move);
+                moveStack.Push(allMoves[i]);
 
-                _DoFakeMove(move.firstPosition, move.secondPosition);
+                _DoFakeMove(allMoves[i].firstPosition, allMoves[i].secondPosition);
 
                 score = AB(depth - 1, alpha, beta, false);
 
@@ -52,10 +50,10 @@ public class AlphaBeta
 
                 if (score > alpha)
                 {
-                    move.score = score;
-                    if (move.score > bestMove.score && depth == maxDepth)
+                    allMoves[i].score = score;
+                    if (allMoves[i].score > bestMove.score && depth == maxDepth)
                     {
-                        bestMove = move;
+                        bestMove = allMoves[i];
                     }
                     alpha = score;
                 }
@@ -70,19 +68,18 @@ public class AlphaBeta
         {
             int score = 10000000;
             List<Move> allMoves = _GetMoves(Piece.playerColor.WHITE);
-            foreach (Move move in allMoves)
+            for (int i = 0; i < allMoves.Count; i++)
             {
-                moveStack.Push(move);
+                moveStack.Push(allMoves[i]);
 
-                _DoFakeMove(move.firstPosition, move.secondPosition);
+                _DoFakeMove(allMoves[i].firstPosition, allMoves[i].secondPosition);
 
                 score = AB(depth - 1, alpha, beta, true);
-
                 _UndoFakeMove();
 
                 if (score < beta)
                 {
-                    move.score = score;
+                    allMoves[i].score = score;
                     beta = score;
                 }
                 if (score <= alpha)
@@ -91,7 +88,13 @@ public class AlphaBeta
                 }
             }
             return beta;
+
         }
+    }
+    IEnumerator undoFake()
+    {
+        yield return new WaitForSeconds(.3f);
+
     }
 
     void _UndoFakeMove()
@@ -129,14 +132,14 @@ public class AlphaBeta
             pieces = _blackPieces;
         else pieces = _whitePieces;
 
-        foreach (Tile tile in pieces)
+        for (int i = 0; i < pieces.Count; i++)
         {
             MoveFactory factory = new MoveFactory(_board);
-            List<Move> pieceMoves = factory.GetMoves(tile.CurrentPiece, tile.Position);
+            List<Move> pieceMoves = factory.GetMoves(pieces[i].CurrentPiece, pieces[i].Position);
 
-            foreach(Move move in pieceMoves)
+            for (int j = 0; j < pieceMoves.Count; j++)
             {
-                Move newMove = _CreateMove(move.firstPosition, move.secondPosition);
+                Move newMove = _CreateMove(pieceMoves[j].firstPosition, pieceMoves[j].secondPosition);
                 turnMove.Add(newMove);
             }
         }
@@ -149,7 +152,7 @@ public class AlphaBeta
         float whiteWeight = 0;
         float blackWeight = 0;
 
-        foreach(Tile tile in _whitePieces)
+        foreach (Tile tile in _whitePieces)
         {
             whiteWeight += _weight.GetBoardWeight(tile.CurrentPiece.Type, tile.CurrentPiece.position, Piece.playerColor.WHITE);
         }
@@ -180,17 +183,17 @@ public class AlphaBeta
                 }
             }
         }
-        foreach (Tile tile in _tilesWithPieces)
+        for (int i = 0; i < _tilesWithPieces.Count; i++)
         {
-            if (tile.CurrentPiece.Player == Piece.playerColor.BLACK)
+            if (_tilesWithPieces[i].CurrentPiece.Player == Piece.playerColor.BLACK)
             {
-                _blackScore += _weight.GetPieceWeight(tile.CurrentPiece.Type);
-                _blackPieces.Add(tile);
+                _blackScore += _weight.GetPieceWeight(_tilesWithPieces[i].CurrentPiece.Type);
+                _blackPieces.Add(_tilesWithPieces[i]);
             }
             else
             {
-                _whiteScore += _weight.GetPieceWeight(tile.CurrentPiece.Type);
-                _whitePieces.Add(tile);
+                _whiteScore += _weight.GetPieceWeight(_tilesWithPieces[i].CurrentPiece.Type);
+                _whitePieces.Add(_tilesWithPieces[i]);
             }
         }
     }
@@ -201,7 +204,7 @@ public class AlphaBeta
         tempMove.firstPosition = tile;
         tempMove.pieceMoved = tile.CurrentPiece;
         tempMove.secondPosition = move;
-        
+
         if (move.CurrentPiece != null)
         {
             tempMove.pieceKilled = move.CurrentPiece;
@@ -209,5 +212,4 @@ public class AlphaBeta
 
         return tempMove;
     }
-} 
-
+}

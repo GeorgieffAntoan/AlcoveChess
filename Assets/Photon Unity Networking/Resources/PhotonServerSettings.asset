@@ -28,9 +28,11 @@ MonoBehaviour:
   NetworkLogging: 1
   RunInBackground: 1
   RpcList:
+  - Action2
   - Chat
   - DestroyRpc
   - InstantiateRpc
+  - Multi
   - PickupItemInit
   - PunPickup
   - PunPickupSimple
@@ -38,8 +40,7 @@ MonoBehaviour:
   - RequestForPickupItems
   - RequestForPickupTimes
   - SetColor
-  - OnPointerClick
-  - ColorChange
-  - Action
-  - MovePiece
+  - Single
+  - SwapPieces
+  - Turn
   DisableAutoOpenWizard: 1

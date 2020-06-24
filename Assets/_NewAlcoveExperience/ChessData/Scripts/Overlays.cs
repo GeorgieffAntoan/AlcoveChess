@@ -4,29 +4,27 @@ using System.Collections;
 public class Overlays : MonoBehaviour
 {
     private ObjectPointer objectPointer;
+    private ObjectPointer objectPointer1;
+    public PhotonView photonView;
+
 
     void Start()
     {
         objectPointer = GameObject.Find("Laser").GetComponent<ObjectPointer>();
+        objectPointer1 = GameObject.Find("Laser").GetComponent<ObjectPointer>();
     }
-
-    void Update()
-    {
-      //  if (objectPointer.go.name.Equals(this.name))
-      //  {
-       //     Action();
-      //  }
-    }
-
+    
     public void Action()
     {
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
+        foreach (GameObject o in objects)
         {
-            GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
-            foreach (GameObject o in objects)
-            {
-                Destroy(o);
-            }
-        } 
+           Destroy(o);
+        }
+    }
+
+    public void Action2()
+    {
+       
     }
 }

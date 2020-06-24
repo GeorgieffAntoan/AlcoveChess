@@ -117811,6 +117811,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1423202710451495868, guid: d0a80d931586db540ae0a85cd549e82d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 5459920607279770738, guid: d0a80d931586db540ae0a85cd549e82d,
         type: 3}
       propertyPath: _trackingOriginType
@@ -117830,6 +117835,11 @@ PrefabInstance:
         type: 3}
       propertyPath: lerpThreshold
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1423202711739705036, guid: d0a80d931586db540ae0a85cd549e82d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 16
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d0a80d931586db540ae0a85cd549e82d, type: 3}

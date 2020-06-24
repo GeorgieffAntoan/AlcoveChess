@@ -118,7 +118,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 0.3.1.28
+  bundleVersion: 0.3.1.83
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -161,7 +161,7 @@ PlayerSettings:
     Standalone: com.aarpinnovation.alcoveplayground
     iOS: com.oculus.UnitySample
   buildNumber: {}
-  AndroidBundleVersionCode: 32
+  AndroidBundleVersionCode: 87
   AndroidMinSdkVersion: 23
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 0

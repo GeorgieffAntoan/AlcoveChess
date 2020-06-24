@@ -11,6 +11,8 @@ public class Piece : MonoBehaviour
     public enum playerColor { BLACK, WHITE, UNKNOWN = -1 };
 
     private ObjectPointer objectPointer;
+    private ObjectPointer objectPointer1;
+
 
     [SerializeField] private pieceType _type = pieceType.UNKNOWN;
     [SerializeField] private playerColor _player = playerColor.WHITE;
@@ -23,12 +25,12 @@ public class Piece : MonoBehaviour
     {
         get { return _player; }
     }
-   
+
     public Sprite pieceImage = null;
     public int2 position;
     private Vector3 moveTo;
     private GameManager manager;
-
+    PhotonView photonView;
     private MoveFactory factory = new MoveFactory(Board.Instance);
     private List<Move> moves = new List<Move>();
 
@@ -38,12 +40,17 @@ public class Piece : MonoBehaviour
         get { return _hasMoved; }
         set { _hasMoved = value; }
     }
-
     [PunRPC]
+    public void Action2()
+    {
+       
+       
+    }
+
     public void Action()
     {
-       // if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
-       // {
+        if (_player == playerColor.WHITE && PhotonNetwork.isMasterClient)
+        {
             moves.Clear();
             GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
             foreach (GameObject o in objects)
@@ -57,8 +64,10 @@ public class Piece : MonoBehaviour
                 {
                     GameObject instance = Instantiate(Resources.Load("MoveCube")) as GameObject;
                     int2 offset = position - move.secondPosition.Position;
+                    //GameObject instance = PhotonNetwork.Instantiate("MoveCube", (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z)), transform.rotation, 1);
+
                     instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
-                    instance.transform.localScale = transform.lossyScale;
+                    instance.transform.localScale = transform.lossyScale/1.01f;
                     instance.transform.rotation = transform.rotation;
                     instance.GetComponent<Container>().move = move;
                     manager.EndTurn();
@@ -68,7 +77,53 @@ public class Piece : MonoBehaviour
                 {
                     GameObject instance = Instantiate(Resources.Load("KillCube")) as GameObject;
                     int2 offset = position - move.secondPosition.Position;
-                    instance.transform.localScale = transform.lossyScale;
+                    //   GameObject instance = PhotonNetwork.Instantiate("KillCube", (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z)), transform.rotation, 1);
+
+                    instance.transform.localScale = transform.lossyScale/1.01f;
+                    instance.transform.rotation = transform.rotation;
+                    instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
+                    instance.GetComponent<Container>().move = move;
+                    manager.EndTurn();
+
+
+                }
+            }
+            GameObject i = Instantiate(Resources.Load("CurrentPiece")) as GameObject;
+            //   GameObject i = PhotonNetwork.Instantiate("CurrentPiece", this.transform.position, transform.rotation, 1);
+
+            i.transform.position = this.transform.position;
+            i.transform.localScale = transform.lossyScale/1.01f;
+            i.transform.rotation = transform.rotation;
+        }
+        if (!manager.sngP && !PhotonNetwork.isMasterClient && _player == playerColor.BLACK)
+        {
+            moves.Clear();
+            GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
+            foreach (GameObject o in objects)
+            {
+                Destroy(o);
+            }
+            moves = factory.GetMoves(this, position);
+            foreach (Move move in moves)
+            {
+                if (move.pieceKilled == null)
+                {
+                    GameObject instance = Instantiate(Resources.Load("MoveCube")) as GameObject;
+                    int2 offset = position - move.secondPosition.Position;
+                    //GameObject instance = PhotonNetwork.Instantiate("MoveCube", (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z)), transform.rotation, 1);
+                    instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
+                    instance.transform.localScale = transform.lossyScale/1.01f;
+                    instance.transform.rotation = transform.rotation;
+                    instance.GetComponent<Container>().move = move;
+                    manager.EndTurn();
+
+                }
+                else if (move.pieceKilled != null)
+                {
+                    GameObject instance = Instantiate(Resources.Load("KillCube")) as GameObject;
+                    int2 offset = position - move.secondPosition.Position;
+                    //  GameObject instance = PhotonNetwork.Instantiate("KillCube", (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z)), transform.rotation, 1);
+                    instance.transform.localScale = transform.lossyScale/1.01f;
                     instance.transform.rotation = transform.rotation;
                     instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
                     instance.GetComponent<Container>().move = move;
@@ -77,49 +132,17 @@ public class Piece : MonoBehaviour
                 }
             }
             GameObject i = Instantiate(Resources.Load("CurrentPiece")) as GameObject;
+            //   GameObject i = PhotonNetwork.Instantiate("CurrentPiece", this.transform.position, transform.rotation, 1);
             i.transform.position = this.transform.position;
-            i.transform.localScale = transform.lossyScale;
+            i.transform.localScale = transform.lossyScale/1.01f;
             i.transform.rotation = transform.rotation;
-      //  }
-        /*    if (!manager.sngP)
-            {
-                if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger) && _player2 == playerColor.BLACK)
-                {
-                    moves.Clear();
-                    GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
-                    foreach (GameObject o in objects)
-                    {
-                        Destroy(o);
-                    }
-                    moves = factory.GetMoves(this, position);
-                    foreach (Move move in moves)
-                    {
-                        if (move.pieceKilled == null)
-                        {
-                            GameObject instance = Instantiate(Resources.Load("MoveCube")) as GameObject;
-                            int2 offset = position - move.secondPosition.Position;
-                            instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
-                            instance.transform.localScale = transform.lossyScale;
-                            instance.transform.rotation = transform.rotation;
-                            instance.GetComponent<Container>().move = move;
-                        }
-                        else if (move.pieceKilled != null)
-                        {
-                            GameObject instance = Instantiate(Resources.Load("KillCube")) as GameObject;
-                            int2 offset = position - move.secondPosition.Position;
-                            instance.transform.localScale = transform.lossyScale;
-                            instance.transform.rotation = transform.rotation;
-                            instance.transform.position = (transform.position + new Vector3(offset.x * transform.lossyScale.x, 0, -offset.y * transform.lossyScale.z));
-                            instance.GetComponent<Container>().move = move;
-                        }
-                    }
-                    GameObject i = Instantiate(Resources.Load("CurrentPiece")) as GameObject;
-                    i.transform.position = this.transform.position;
-                    i.transform.localScale = transform.lossyScale;
-                    i.transform.rotation = transform.rotation;
-                }
-            }
-        } */
+        }
+    }
+
+    [PunRPC]
+    public void Turn(bool a)
+    {
+        a = !a;
     }
 
     public void MovePiece(int2 pos)
@@ -133,18 +156,14 @@ public class Piece : MonoBehaviour
         transform.localPosition = new Vector3(position.x, 0, -position.y);
         moveTo = this.transform.localPosition;
         manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
-       objectPointer = GameObject.Find("Laser").GetComponent<ObjectPointer>();
- 
+        objectPointer = GameObject.Find("Laser").GetComponent<ObjectPointer>();
+        objectPointer1 = GameObject.Find("Laser").GetComponent<ObjectPointer>();
+        me = true;
     }
 
-    void Update()
+    public bool me = true;
+    void FixedUpdate()
     {
         transform.localPosition = Vector3.Lerp(this.transform.localPosition, moveTo, 3 * Time.deltaTime);
-        if (/*objectPointer != null && objectPointer.go == gameObject &&*/ OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
-        {
-            PhotonView photonView = GetComponent<PhotonView>();
-          //  photonView.RPC("Action", PhotonTargets.AllBuffered);
-         //   Action();
-        }
     }
 }

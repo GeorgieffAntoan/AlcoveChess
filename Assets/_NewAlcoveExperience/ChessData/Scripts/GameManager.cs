@@ -4,8 +4,11 @@ using Unity.Mathematics;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
+using Photon;
+using UnityEngine.Scripting;
+using System;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Photon.PunBehaviour
 {
     AlphaBeta ab = new AlphaBeta();
     private bool _kingDead = false;
@@ -15,27 +18,38 @@ public class GameManager : MonoBehaviour
     public GameObject me;
     public AudioSource playMe;
     public GameObject startPanel;
-  //  GameObject laser;
+    PhotonView photonView2;
+    PhotonView photonView13;
+    public GameObject chessPieceWhite;
+    public GameObject chessPieceBlack;
+    Tile firstTile;
+    Tile secondTile;
+    [SerializeField] private float maxTimeBetweenGarbageCollections = 15f;
+    private float _timeSinceLastGarbageCollection;
+
+
+    //  GameObject laser;
     public bool sngP = true;
 
-	void Start ()
+    void Start()
     {
         OVRManager.display.displayFrequency = 72.0f;
         _board = Board.Instance;
         _board.SetupBoard();
         playMe.Play();
-      //  laser = GameObject.Find("Laser");
+        //  laser = GameObject.Find("Laser");
         //set my team
         if (PhotonNetwork.isMasterClient)
             myTeam = "WHITE"; //host is always white
         else
             myTeam = "BLACK";
         startPanel.SetActive(true);
+        playerTurn = true;
     }
 
     public int requiredPlayers = 2;
     public string myTeam = "";
-    
+
     //Room custom property changed (turn change)
     public void OnPhotonCustomRoomPropertiesChanged(Hashtable changedProps)
     {
@@ -56,17 +70,17 @@ public class GameManager : MonoBehaviour
             //i am white team
             if (myTeam == "WHITE")
             {
-                    GameObject.Find("WhitePieces").layer = LayerMask.NameToLayer("PhysicsInteractable");
-                    foreach (Transform child in GameObject.Find("WhitePieces").GetComponentsInChildren<Transform>(true))
-                    {
-                        child.gameObject.layer = LayerMask.NameToLayer("PhysicsInteractable");
-                    }
-                    GameObject.Find("BlackPieces").layer = LayerMask.NameToLayer("Ignore Raycast");
-                    foreach (Transform child in GameObject.Find("BlackPieces").GetComponentsInChildren<Transform>(true))
-                    {
-                        child.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-                    }          
-            }  
+                GameObject.Find("WhitePieces").layer = LayerMask.NameToLayer("PhysicsInteractable");
+                foreach (Transform child in GameObject.Find("WhitePieces").GetComponentsInChildren<Transform>(true))
+                {
+                    child.gameObject.layer = LayerMask.NameToLayer("PhysicsInteractable");
+                }
+                GameObject.Find("BlackPieces").layer = LayerMask.NameToLayer("Ignore Raycast");
+                foreach (Transform child in GameObject.Find("BlackPieces").GetComponentsInChildren<Transform>(true))
+                {
+                    child.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                }
+            }
             else if (myTeam == "BLACK")
             {
                 GameObject.Find("WhitePieces").layer = LayerMask.NameToLayer("Ignore Raycast");
@@ -108,8 +122,8 @@ public class GameManager : MonoBehaviour
         Hashtable props = new Hashtable { { "TURN", myTeam } };
         PhotonNetwork.room.SetCustomProperties(props);
     }
-    
-    void Update ()
+
+    void Update()
     {
         if (_kingDead)
         {
@@ -129,7 +143,18 @@ public class GameManager : MonoBehaviour
             }
             timer = 0;
         }
-	}
+        _timeSinceLastGarbageCollection += Time.unscaledDeltaTime;
+        if (_timeSinceLastGarbageCollection > maxTimeBetweenGarbageCollections)
+        {
+            GC.Collect();
+            _timeSinceLastGarbageCollection = 0f;
+        }
+      // if (firstTile.CurrentPiece.position.x == secondTile.CurrentPiece.position.x) Destroy(secondTile.CurrentPiece.gameObject);
+        if (PhotonNetwork.isMasterClient)
+            myTeam = "WHITE"; //host is always white
+        else
+            myTeam = "BLACK";
+    }
 
     public bool playerTurn = true;
 
@@ -149,6 +174,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void Click()
+    {
+    }
+
+    public override void OnOwnershipRequest(object[] viewAndPlayer)
+    {
+        PhotonView view = viewAndPlayer[0] as PhotonView;
+        PhotonPlayer requestingPlayer = viewAndPlayer[1] as PhotonPlayer;
+
+        photonView.TransferOwnership(requestingPlayer);
+    }
+
+    [PunRPC]
     public void SwapPieces(Move move)
     {
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Highlight");
@@ -156,9 +194,9 @@ public class GameManager : MonoBehaviour
         {
             Destroy(o);
         }
-
-        Tile firstTile = move.firstPosition;
-        Tile secondTile = move.secondPosition;
+    
+         firstTile = move.firstPosition;
+         secondTile = move.secondPosition;
 
         firstTile.CurrentPiece.MovePiece(new int2(move.secondPosition.Position.x, move.secondPosition.Position.y));
 
@@ -167,23 +205,62 @@ public class GameManager : MonoBehaviour
             if (secondTile.CurrentPiece.Type == Piece.pieceType.KING)
                 _kingDead = true;
             Destroy(secondTile.CurrentPiece.gameObject);
+
         }
         secondTile.CurrentPiece = move.pieceMoved;
         firstTile.CurrentPiece = null;
         secondTile.CurrentPiece.position = secondTile.Position;
         secondTile.CurrentPiece.HasMoved = true;
-        playerTurn = !playerTurn;        
+      //  EndTurn();
+        if (sngP)    playerTurn = !playerTurn;
+
+        //  Destroy(secondTile.CurrentPiece.gameObject);
+        if (!sngP)
+        {
+            photonView2 = GetComponent<PhotonView>();
+            photonView2.RPC("Turn", PhotonTargets.AllBuffered, playerTurn);
+        }
     }
+
+
+
+    [PunRPC]
+    public void Turn(bool a)
+    {
+        a = !a;
+        return;
+    } 
 
     public void SinglePlayer()
     {
+        photonView2 = GetComponent<PhotonView>();
+        photonView2.RPC("Single", PhotonTargets.AllBuffered);
+    }
+
+
+    [PunRPC]
+    public void Single()
+    {
         sngP = true;
         startPanel.SetActive(false);
+        //  chessPieceBlack.SetActive(true);
+        //  chessPieceWhite.SetActive(true);
+      //  PhotonNetwork.Instantiate("Board", new Vector3(3.61f, 0f, -3.29f), Quaternion.identity, 1);
     }
 
     public void MultiPlayer()
     {
+        photonView2 = GetComponent<PhotonView>();
+        photonView2.RPC("Multi", PhotonTargets.AllBuffered);
+    }
+    [PunRPC]
+    public void Multi()
+    {
         sngP = false;
         startPanel.SetActive(false);
+        //chessPieceBlack.SetActive(true);
+        // chessPieceWhite.SetActive(true);
+     //   PhotonNetwork.Instantiate("Board", new Vector3(3.61f, 0f, -3.29f), Quaternion.identity, 1);
+
     }
 }

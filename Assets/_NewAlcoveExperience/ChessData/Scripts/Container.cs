@@ -8,28 +8,32 @@ public class Container : MonoBehaviour
     public Move move;
     GameManager manager;
     private ObjectPointer objectPointer;
+    private ObjectPointer objectPointer1;
+
+
     PhotonView photonView;
 
     void Start()
     {
-        manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+       manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
        objectPointer = GameObject.Find("Laser").GetComponent<ObjectPointer>();
+        objectPointer1 = GameObject.Find("Laser").GetComponent<ObjectPointer>();
+
     }
 
     void Update()
-    {
-       // if (objectPointer.go.name.Equals(this.name))
-     //   {
-        //    Action();
-       // }
+    {   
     }
     public void Action()
     {
-        Debug.Log("clicking");
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))// && move != null)
-        {
-            Debug.Log("should move");
-            manager.SwapPieces(move);          
-        }
+        manager.SwapPieces(move);
+
+     // photonView = GetComponent<PhotonView>();
+     // photonView.RPC("SwapPieces", PhotonTargets.AllBuffered, move);
+    }
+    
+    public void SwapMe()
+    {
+        manager.SwapPieces(move);
     }
 }

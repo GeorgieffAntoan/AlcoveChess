@@ -10,6 +10,8 @@ TagManager:
   - Highlighted
   - Highlight
   - tagged
+  - Black
+  - White
   layers:
   - Default
   - TransparentFX
@@ -27,7 +29,7 @@ TagManager:
   - Loading
   - LitByDirectionalLight
   - Avatar
-  - 
+  - Laser
   - 
   - 
   - 

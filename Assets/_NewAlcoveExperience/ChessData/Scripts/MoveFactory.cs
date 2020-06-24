@@ -32,7 +32,7 @@ public class MoveFactory
         _player = piece.Player;
         _position = position;
 
-        foreach(KeyValuePair<Piece.pieceType, System.Action> p in pieceToFunction)
+        foreach (KeyValuePair<Piece.pieceType, System.Action> p in pieceToFunction)
         {
             if (_type == p.Key)
             {
@@ -196,13 +196,13 @@ public class MoveFactory
     {
         if (_player != tile.CurrentPiece.Player)
         {
-        //    Debug.Log("its me");
+            //    Debug.Log("its me");
 
             return true;
         }
         else
         {
-       //     Debug.Log("its you");
+            //     Debug.Log("its you");
             return false;
         }
     }

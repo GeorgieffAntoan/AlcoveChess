@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ObjectPointer : MonoBehaviour
 {
-  /*  public GameObject pointer;
+   public GameObject pointer;
 
     public GameObject go;
 
@@ -59,5 +59,5 @@ public class ObjectPointer : MonoBehaviour
     public GameObject GetPointedGo()
     {
         return go;
-    }  */
+    }  
 }

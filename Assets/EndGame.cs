@@ -20,6 +20,9 @@ public class EndGame : MonoBehaviour
 
     public void Click()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (PhotonNetwork.isMasterClient) {
+            PhotonNetwork.automaticallySyncScene = true;
+            PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 }
